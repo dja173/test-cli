@@ -15,4 +15,24 @@ class Scraper
     pets
   end
   
-  
+  def self.scrape_pet_profile(url)
+    pet_profile_details = {}
+
+    pet_profile = "http://www.vrcpitbull.com" + url
+    doc = Nokogiri::HTML(open(pet_profile))
+
+    pet_items = doc.css("div.rescue-groups-pet-info-item")
+
+    pet_items.each do |attribute|
+      if attribute.css("span.gray").text == "Size:"
+        pet_profile_details[:size] = attribute.css("span.bold.black").text
+      elsif attribute.css("span.gray").text == "Color:"
+        pet_profile_details[:color] = attribute.css("span.bold.black").text
+      elsif attribute.css("span.gray").text == "Sex:"
+        pet_profile_details[:sex] = attribute.css("span.bold.black").text
+      end
+    end
+    pet_profile_details[:description] = doc.css("section.rescue-groups-pet-info-section p").text.gsub("\n                        ", "")
+    pet_profile_details
+  end
+end
